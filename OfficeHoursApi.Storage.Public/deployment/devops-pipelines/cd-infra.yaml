@@ -1,0 +1,58 @@
+# This is the CD pipeline for provisioning Azure Serivce to host Office Hours API
+name: Pipeline-$(Build.DefinitionName)-$(Date:yyyyMMdd)$(Rev:.r)
+
+# manual trigger
+trigger: none
+
+variables:
+  serviceConn: '<your-ado-service-connection>'
+  resourceGroupName: '<your-resource-group-without-env-suffix>'
+
+  isMain: $[eq(variables['Build.SourceBranch'], 'refs/heads/main')]
+  artifactName: 'bicep-template'
+  recipeName: 'OfficeHoursApi.Storage.Public'
+  yamlTemplateLoc: '/${{variables.recipeName}}/deployment/devops-pipelines/yaml-templates'
+  deploymentFolder: '/${{variables.recipeName}}/deployment'
+
+pool:
+  vmImage: windows-latest
+
+stages:
+- stage: Build
+  displayName: 'Build IaC'
+  condition: and(succeeded(), eq(variables.isMain, 'true')) 
+  jobs:
+  - job: Build
+    displayName: 'Package and Publish Bicep'
+    steps:
+    - template: '/${{variables.yamlTemplateLoc}}/create-infra-package.yaml'
+      parameters:
+        resourceGroupName: $(resourceGroupName)
+        artifactName: $(artifactName)
+        deploymentFolder: $(deploymentFolder)
+
+- stage: Test_Infra
+  displayName: 'Provision to Test'
+  condition: and(succeeded(), eq(variables.isMain, 'true')) 
+  variables:
+    targetEnv: 'test'
+  jobs:
+  - template: '/${{variables.yamlTemplateLoc}}/provision-infra.yaml'
+    parameters:
+      deployArtifact: $(artifactName)
+      resourceGroupName: $(resourceGroupName)
+      targetEnv: ${{variables.targetEnv}}
+      serviceConnection: '${{variables.serviceConn}}-${{variables.targetEnv}}'
+
+- stage: Prod_Infra
+  displayName: 'Provision to Prod'
+  condition: and(succeeded(), eq(variables.isMain, 'true')) 
+  variables:
+    targetEnv: 'prod'
+  jobs:
+  - template: '/${{variables.yamlTemplateLoc}}/provision-infra.yaml'
+    parameters:
+      deployArtifact: $(artifactName)
+      resourceGroupName: $(resourceGroupName)
+      targetEnv: ${{variables.targetEnv}}
+      serviceConnection: '${{variables.serviceConn}}-${{variables.targetEnv}}'

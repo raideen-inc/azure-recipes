@@ -1,0 +1,71 @@
+# This is the CD pipeline for provisioning Azure Serivce to host Office Hours API
+name: Pipeline-$(Build.DefinitionName)-$(Date:yyyyMMdd)$(Rev:.r)
+
+# manual trigger
+trigger: none
+
+variables:
+  serviceConn: '<your-ado-service-connection>'
+  resourceGroupName: '<your-resource-group-without-env-suffix>'
+  appServiceName: '<your-resource-group-without-env-suffix>'
+
+  recipeName: 'OfficeHoursApi.Storage.Public'
+  buildConfiguration: 'Release'
+  projectFolder: 'Raideen.OfficeHours'
+  appName: 'Raideen.OfficeHours.Storage.PublicApi'
+
+  artifactName: 'bicep-template'
+  yamlTemplateLoc: '/${{variables.recipeName}}/deployment/devops-pipelines/yaml-templates'
+  deploymentFolder: '/${{variables.recipeName}}/deployment'
+  targetEnv: 'dev'
+
+pool:
+  vmImage: windows-latest
+
+stages:
+- stage: Build
+  displayName: 'Build IaC and App'
+  jobs:
+  - job: Build
+    displayName: 'Build Office Hours API'
+    steps:
+    - task: UseDotNet@2
+      displayName: 'Download .NET'
+      inputs:
+        packageType: sdk
+        version: 6.x
+        installationPath: $(Agent.ToolsDirectory)/dotnet
+
+    - template: '/${{variables.yamlTemplateLoc}}/create-infra-package.yaml'
+      parameters:
+        resourceGroupName: $(resourceGroupName)
+        artifactName: $(artifactName)
+        deploymentFolder: $(deploymentFolder)
+
+    - template: '/${{variables.yamlTemplateLoc}}/build-dotnet-app.yaml'
+      parameters:
+        displayAppName: $(recipeName)
+        solution: '$(Build.SourcesDirectory)/$(recipeName)/development/$(projectFolder)/$(appName)/$(appName).csproj'
+        testProject: '$(Build.SourcesDirectory)/$(recipeName)/development/$(projectFolder)/$(appName).UnitTest/$(appName).UnitTest.csproj'
+        artifactName: $(appName)
+
+- stage: Dev_Infra
+  displayName: 'Provision to DEV'
+  jobs:
+  - template: '/${{variables.yamlTemplateLoc}}/provision-infra.yaml'
+    parameters:
+      deployArtifact: $(artifactName)
+      resourceGroupName: $(resourceGroupName)
+      targetEnv: ${{variables.targetEnv}}
+      serviceConnection: $(serviceConn)
+
+- stage: Dev_App
+  displayName: 'Deploy to DEV'
+  jobs:
+  - template: '/${{variables.yamlTemplateLoc}}/deploy-web-app.yaml'
+    parameters:
+        targetEnv: ${{variables.targetEnv}}
+        displayAppName: $(recipeName)
+        artifactName: $(appName)
+        serviceConnection: $(serviceConn)
+        webAppName: '$(appServiceName)-$(targetEnv)'

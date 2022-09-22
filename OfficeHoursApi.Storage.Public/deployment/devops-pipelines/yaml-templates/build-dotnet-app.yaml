@@ -1,0 +1,48 @@
+# This is a shared template for CI: Build, Scan, Unit Test, Package for DotNet (C#) 
+parameters:
+  - name: displayAppName # use for labeling the stage, should be aplhanumeric only
+    type: string
+  - name: solution 
+    type: string
+  - name: testProject 
+    type: string
+    default: ''
+  - name: buildConfiguration
+    type: string
+    default: 'Release'
+  - name: artifactName 
+    type: string
+    default: ''
+
+steps:
+- task: DotNetCoreCLI@2
+  displayName: 'Build ${{parameters.displayAppName}}'
+  inputs:
+    command: 'build'
+    projects: '${{parameters.solution}}'
+    arguments: '--configuration $(buildConfiguration)'
+
+- task: DotNetCoreCLI@2
+  condition: and(ne('${{parameters.testProject}}', ''), eq(variables['Agent.JobStatus'], 'Succeeded'))
+  displayName: 'Unit Test ${{parameters.displayAppName}}'
+  inputs:
+    command: 'test'
+    projects: '${{parameters.testProject}}'
+    arguments: '--collect "Code coverage"'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Packaging ${{parameters.displayAppName}}'
+  condition: and(ne('${{parameters.artifactName}}', ''), eq(variables['Agent.JobStatus'], 'Succeeded'))
+  inputs:
+    command: publish
+    publishWebProjects: false
+    projects: '${{parameters.solution}}'
+    arguments: '--configuration $(buildConfiguration) --output $(build.artifactstagingdirectory)/deploy/${{parameters.displayAppName}}'
+    zipAfterPublish: True
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish ${{parameters.displayAppName}}'
+  condition: and(ne('${{parameters.artifactName}}', ''), eq(variables['Agent.JobStatus'], 'Succeeded'))
+  inputs:
+    PathtoPublish: '$(build.artifactstagingdirectory)/deploy/${{parameters.displayAppName}}'
+    artifactName: ${{parameters.artifactName}}

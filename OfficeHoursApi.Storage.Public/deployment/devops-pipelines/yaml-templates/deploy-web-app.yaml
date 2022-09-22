@@ -1,0 +1,41 @@
+# This is a shared module for CD: Deploying Web App or API App into App Services
+parameters:
+  - name: displayAppName # use for labeling the stage, should be aplhanumeric only
+    type: string
+  - name: targetEnv 
+    type: string
+    default: dev
+    values:
+    - dev
+    - test
+    - prod
+  - name: artifactName 
+    type: string
+  - name: serviceConnection
+    type: string
+  - name: webAppName
+    type: string
+
+jobs:
+- deployment: Deploy_App
+  displayName: Deploy App
+  variables:
+    targetEnvName: ${{upper(parameters.targetEnv)}}
+  environment: ${{variables.targetEnvName}}
+  strategy:
+    runOnce:
+      deploy:
+        steps:
+        - download: none
+        - task: DownloadPipelineArtifact@2
+          displayName: 'Download Artifact'
+          inputs:
+            artifact: ${{parameters.artifactName}}
+            path: $(Build.SourcesDirectory)/drop
+
+        - task: AzureWebApp@1 
+          displayName: Deploy ${{parameters.displayAppName}} to ${{parameters.targetEnv}}
+          inputs:
+            azureSubscription: ${{parameters.serviceConnection}}
+            appName: ${{parameters.webAppName}}
+            package: $(Build.SourcesDirectory)/drop/**/${{parameters.artifactName}}.zip
