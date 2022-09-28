@@ -1,0 +1,16 @@
+# File: Share variables
+variables:
+  serviceConn: 'sc-rg-demo-azurerecipes'
+  resourceGroupName: 'rg-demo-azurerecipes'
+  appServiceName: 'app-demo-officehoursapi'
+
+  recipeName: 'OfficeHoursApi.Storage.Public'
+  projectFolder: 'Raideen.OfficeHours'
+  appName: 'Raideen.OfficeHours.Storage.PublicApi'
+  buildConfiguration: 'Release'
+
+  artifactName: 'bicep-template'
+  yamlTemplateLoc: '/${{variables.recipeName}}/deployment/devops-pipelines/yaml-templates'
+  deploymentFolder: '/${{variables.recipeName}}/deployment'
+
+  isMain: $[eq(variables['Build.SourceBranch'], 'refs/heads/main')]

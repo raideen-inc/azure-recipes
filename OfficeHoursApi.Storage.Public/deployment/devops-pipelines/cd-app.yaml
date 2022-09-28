@@ -8,15 +8,7 @@ pool:
   vmImage: windows-latest
 
 variables:
-  serviceConn: '<your-ado-service-connection>'
-  appServiceName: '<your-resource-group-without-env-suffix>'
-
-  isMain: $[eq(variables['Build.SourceBranch'], 'refs/heads/main')]
-  recipeName: 'OfficeHoursApi.Storage.Public'
-  buildConfiguration: 'Release'
-  projectFolder: 'Raideen.OfficeHours'
-  appName: 'Raideen.OfficeHours.Storage.PublicApi'
-  yamlTemplateLoc: '/${{variables.recipeName}}/deployment/devops-pipelines/yaml-templates'
+- template: ./yaml-templates/variables.yaml
 
 stages:
 - stage: Build

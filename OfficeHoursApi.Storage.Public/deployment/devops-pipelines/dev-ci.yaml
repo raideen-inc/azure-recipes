@@ -8,11 +8,9 @@ pool:
   vmImage: windows-latest
 
 variables:
-  recipeName: 'OfficeHoursApi.Storage.Public'
-  buildConfiguration: 'Release'
-  projectFolder: 'Raideen.OfficeHours'
-  appName: 'Raideen.OfficeHours.Storage.PublicApi'
-  yamlTemplateLoc: '/${{variables.recipeName}}/deployment/devops-pipelines/yaml-templates'
+- template: ./yaml-templates/variables.yaml
+- name: targetEnv
+  value: dev
 
 stages:
 - stage: Build

@@ -5,14 +5,7 @@ name: Pipeline-$(Build.DefinitionName)-$(Date:yyyyMMdd)$(Rev:.r)
 trigger: none
 
 variables:
-  serviceConn: '<your-ado-service-connection>'
-  resourceGroupName: '<your-resource-group-without-env-suffix>'
-
-  isMain: $[eq(variables['Build.SourceBranch'], 'refs/heads/main')]
-  artifactName: 'bicep-template'
-  recipeName: 'OfficeHoursApi.Storage.Public'
-  yamlTemplateLoc: '/${{variables.recipeName}}/deployment/devops-pipelines/yaml-templates'
-  deploymentFolder: '/${{variables.recipeName}}/deployment'
+- template: ./yaml-templates/variables.yaml
 
 pool:
   vmImage: windows-latest

@@ -31,8 +31,8 @@ param storageSku string
 param unqiueUtc string = utcNow()
 
 // Generate Azure Service name for different environment
-var appName = '<your-app-name>'
-var orgAbbr = '<your-org-abbreviations>'
+var appName = 'officehoursapi'
+var orgAbbr = 'demo'
 var planName = 'plan-${orgAbbr}-${appName}-${environmentName}'
 var webAppName = 'app-${orgAbbr}-${appName}-${environmentName}'
 var storageAcctName = 'st${orgAbbr}${appName}${environmentName}'
