@@ -1,0 +1,76 @@
+parameters:
+  - name: deployArtifact
+    displayName: 'Name of the artifact for provisioning'
+    type: string
+  - name: resourceGroupName 
+    displayName: 'Target resource group without envrionment suffix'
+    type: string
+  - name: keyVaultName
+    displayName: 'Name of the Key Vault without suffix to retrieve secrets'
+    type: string
+    default: ''
+  - name: targetEnv
+    displayName: 'Target environment (dev/test/prod)'
+    type: string
+    values:
+    - dev
+    - test
+    - prod
+  - name: serviceConnection
+    displayName: 'Name of Service Connection for deployment'
+    type: string
+
+jobs:
+- deployment: Provision_Infrastructure
+  displayName: Provision Infrastructure
+  variables:
+    rg-full-name: '${{parameters.resourceGroupName}}-${{parameters.targetEnv}}'
+    kv-full-name: '${{parameters.keyVaultName}}-${{parameters.targetEnv}}'
+    targetEnvName: ${{upper(parameters.targetEnv)}}
+  environment: ${{variables.targetEnvName}}
+  strategy:
+    runOnce:
+      deploy:
+        steps:
+        - download: none
+        - download: current
+          displayName: 'Download Artifact'
+          artifact: ${{parameters.deployArtifact}}
+        - task: AzureKeyVault@2
+          displayName: 'Get required secrets'
+          condition: ne('${{parameters.keyVaultName}}', '')
+          inputs:
+            azureSubscription: ${{parameters.serviceConnection}}
+            KeyVaultName: $(kv-full-name)
+            SecretsFilter: 'cicd-sqlSvrAdminPassword,cicd-sqlSvrAdminLogin,cicd-sqlSvrAadUser'
+            RunAsPreJob: false
+
+        - task: AzureCLI@2
+          displayName: 'Provision Services (${{variables.targetEnvName}})'
+          inputs:
+            azureSubscription: ${{parameters.serviceConnection}}
+            scriptType: pscore
+            scriptLocation: inlineScript
+            inlineScript: |
+              $sqlAadUserObjectId = (az ad user show --id '$(cicd-sqlSvrAadUser)' --query "id" --output tsv)
+              az deployment group create --resource-group $(rg-full-name) --name 'main-$(Build.BuildNumber)' `
+                --template-file '$(Agent.BuildDirectory)/${{parameters.deployArtifact}}/resource-groups/${{parameters.resourceGroupName}}/main.bicep' `
+                --parameters '$(Agent.BuildDirectory)/${{parameters.deployArtifact}}/resource-groups/${{parameters.resourceGroupName}}/main-param-${{parameters.targetEnv}}.json' `
+                --parameters environmentName='${{parameters.targetEnv}}' `
+                --parameters sqlSvrAdminPassword='$(cicd-sqlSvrAdminPassword)' --parameters sqlSvrAdminLogin='$(cicd-sqlSvrAdminLogin)' `
+                --parameters aadAdminLogin='$(cicd-sqlSvrAadUser)' --parameters aadAdminLoginObjectId=$sqlAadUserObjectId
+
+        # This task required Service Principal to have Directory.Read.All permission
+        - task: AzureCLI@2
+          displayName: 'Add SQL User (${{variables.targetEnvName}})'
+          inputs:
+            azureSubscription: ${{parameters.serviceConnection}}
+            scriptType: pscore
+            scriptLocation: scriptPath
+            scriptPath: '$(Agent.BuildDirectory)/${{parameters.deployArtifact}}/scripts/sql-add-user.ps1'
+            workingDirectory: '$(Agent.BuildDirectory)/${{parameters.deployArtifact}}/scripts'
+            arguments: 
+              -sqlAdmin '$(cicd-sqlSvrAdminLogin)' 
+              -sqlPassword '$(cicd-sqlSvrAdminPassword)'
+              -resourceGroupName '$(rg-full-name)' 
+              -deploymentName 'main-$(Build.BuildNumber)'

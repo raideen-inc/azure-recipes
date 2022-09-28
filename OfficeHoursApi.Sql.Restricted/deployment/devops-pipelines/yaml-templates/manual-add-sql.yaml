@@ -1,0 +1,35 @@
+parameters:
+  - name: targetEnv
+    displayName: 'Target environment (dev/test/prod)'
+    type: string
+    values:
+    - dev
+    - test
+    - prod
+  - name: managedIdentityName
+    displayName: 'Name of Managed Identity as SQL User'
+    type: string
+  - name: dependsOnJob
+    displayName: 'Job Name to wait for complete'
+    type: string
+
+jobs:
+- job: 'Manaul_Step'
+  displayName: 'Wait for adding SQL user'
+  dependsOn: ${{parameters.dependsOnJob}}
+  condition: succeeded()
+  pool: server
+  timeoutInMinutes: 1440 # task times out in 1 day
+  variables:
+    managedIdentity: '${{parameters.managedIdentityName}}-${{parameters.targetEnv}}'
+  steps:
+  - task: ManualValidation@0
+    timeoutInMinutes: 1440 # task times out in 1 day
+    inputs:
+      instructions: |
+        Ensure the Managed Identity is added to SQL, if not, execute:
+          CREATE USER [${{variables.managedIdentity}}] FROM EXTERNAL PROVIDER;
+          ALTER ROLE db_datareader ADD MEMBER [${{variables.managedIdentity}}];
+          ALTER ROLE db_datawriter ADD MEMBER [${{variables.managedIdentity}}];
+          ALTER ROLE db_ddladmin ADD MEMBER [${{variables.managedIdentity}}];
+      onTimeout: 'resume'

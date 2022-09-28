@@ -1,0 +1,29 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "environmentName": {
+            "value": "test"
+        },
+        "planSku": {
+            "value": "B1"
+        },
+        "ipAddressesAllowed": {
+            "value": [
+                "99.228.203.235/32",
+                "100.123.123.0/25",
+                "170.123.123.0/25",
+                "173.123.123.0/25",
+                "101.123.123.200/32"
+              ]
+        },
+        "ipAddressesScmAllowed": {
+            "value": [
+                "99.228.203.235/32",
+                "101.123.123.200/32"
+              ]
+        },        "sqlDbSize": {
+            "value": "basic"
+        }
+    }
+}

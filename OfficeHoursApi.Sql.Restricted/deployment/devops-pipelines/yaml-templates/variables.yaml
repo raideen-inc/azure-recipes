@@ -1,0 +1,21 @@
+# File: Share variables
+variables:
+  serviceConn: 'sc-rg-demo-azurerecipes'
+  resourceGroupName: 'rg-demo-azurerecipes'
+  appServiceName: 'app-demo-officehoursapi'
+  keyVaultName: 'kv-demo-azurerecipes'
+
+  recipeName: 'OfficeHoursApi.Sql.Restricted'
+  projectFolder: 'Raideen.OfficeHours'
+  appName: 'Raideen.OfficeHours.Sql.RestrictedApi'
+  buildConfiguration: 'Release'
+
+  yamlTemplateLoc: '/${{variables.recipeName}}/deployment/devops-pipelines/yaml-templates'
+  deploymentFolder: '/${{variables.recipeName}}/deployment'
+  deployArtifact: 'deploy-artifact'
+  scriptArtifact: 'scripts'
+
+  isMain: $[eq(variables['Build.SourceBranch'], 'refs/heads/main')]
+
+
+  
