@@ -1,4 +1,4 @@
-$subName = 'Azure Recipes Sub'
+$subName = 'Azure Recipes Demo Sub'
 $rgName = 'rg-demo-azurerecipes-dev'
 
 $account = (az account show)

@@ -1,5 +1,5 @@
-$subName = '<your-subscription-name>'
-$rgName = '<your-resource-group-name>'
+$subName = 'Azure Recipes Demo Sub'
+$rgName = 'rg-demo-azurerecipes-dev'
 
 $account = (az account show)
 if (!$account)
