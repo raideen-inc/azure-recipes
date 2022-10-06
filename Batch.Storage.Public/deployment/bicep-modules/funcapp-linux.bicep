@@ -33,7 +33,7 @@ param keyVaultName string
 // param storageConnStrSecretName string = 'AzureWebJobsStorage-${funcAppName}'
 
 var storageConnStrSecretName = 'AzureWebJobsStorage-${funcAppName}'
-var appInsightsonnStrSecretName = 'AppInsights-${funcAppName}'
+var appInsightsConnStrSecretName = 'AppInsights-${funcAppName}'
 var configureValues = {
   dotnet: {
     fxVersion: 'dotnetcore'
@@ -69,7 +69,7 @@ var connStringStorage = 'DefaultEndpointsProtocol=https;AccountName=${funcStorag
 var connStringKVReference = '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${storageConnStrSecretName})'
 var storageConnString = IsComsumptionPlan ? connStringStorage : connStringKVReference
 
-var appInsightsKVReference = '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${appInsightsonnStrSecretName})'
+var appInsightsKVReference = '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${appInsightsConnStrSecretName})'
 var appInsightsConnString = IsComsumptionPlan ? funcAppInsights.properties.ConnectionString : appInsightsKVReference
 
 var baseAppSetting = [
@@ -131,7 +131,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2022-07-01' existing = {
   }
 
   resource AppInsightsSecret 'secrets@2022-07-01' = {
-    name: appInsightsonnStrSecretName
+    name: appInsightsConnStrSecretName
     properties:{
       contentType: 'string'
       value: funcAppInsights.properties.ConnectionString
