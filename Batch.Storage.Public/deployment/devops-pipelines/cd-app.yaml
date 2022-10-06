@@ -1,0 +1,67 @@
+# This is the CD pipeline to deploy  Office Hours API
+name: Pipeline-$(Build.DefinitionName)-$(Date:yyyyMMdd)$(Rev:.r)
+
+# manual trigger
+trigger: none
+
+pool:
+  vmImage: windows-latest
+
+variables:
+- template: ./yaml-templates/variables.yaml
+
+stages:
+- stage: Build
+  displayName: 'Build App'
+  condition: and(succeeded(), eq(variables.isMain, 'true')) 
+  jobs:
+  - job: Build
+    displayName: 'Build Office Hours API'
+    steps:
+    - task: UseDotNet@2
+      displayName: 'Download .NET'
+      inputs:
+        packageType: sdk
+        version: 6.x
+        installationPath: $(Agent.ToolsDirectory)/dotnet
+
+    - template: '/${{variables.yamlTemplateLoc}}/build-dotnet-app.yaml'
+      parameters:
+        displayAppName: $(recipeName)
+        solution: '$(Build.SourcesDirectory)/$(recipeName)/development/$(projectFolder)/$(appName)/$(appName).csproj'
+        testProject: '$(Build.SourcesDirectory)/$(recipeName)/development/$(projectFolder)/$(appName).UnitTest/$(appName).UnitTest.csproj'
+        artifactName: $(appName)
+
+- stage: Test_Deploy
+  displayName: 'Deploy to Test'
+  condition: and(succeeded(), eq(variables.isMain, 'true')) 
+  variables:
+    targetEnv: 'test'
+  jobs:
+  - template: '/${{variables.yamlTemplateLoc}}/deploy-func-app.yaml'
+    parameters:
+      resourceGroupName: $(resourceGroupName)
+      targetEnv: ${{variables.targetEnv}}
+      displayAppName: $(recipeName)
+      artifactName: $(appName)
+      serviceConnection: '${{variables.serviceConn}}-${{variables.targetEnv}}'
+      functionAppName: '$(funcAppName)'
+      functionAppType: 'functionAppLinux'
+      scmAccessRequired: true
+
+- stage: Prod_Deploy
+  displayName: 'Deploy to Prod'
+  condition: and(succeeded(), eq(variables.isMain, 'true')) 
+  variables:
+    targetEnv: 'prod'
+  jobs:
+  - template: '/${{variables.yamlTemplateLoc}}/deploy-func-app.yaml'
+    parameters:
+      resourceGroupName: $(resourceGroupName)
+      targetEnv: ${{variables.targetEnv}}
+      displayAppName: $(recipeName)
+      artifactName: $(appName)
+      serviceConnection: '${{variables.serviceConn}}-${{variables.targetEnv}}'
+      functionAppName: '$(funcAppName)'
+      functionAppType: 'functionAppLinux'
+      scmAccessRequired: true

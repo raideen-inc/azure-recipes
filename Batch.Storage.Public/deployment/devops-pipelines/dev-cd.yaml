@@ -1,0 +1,66 @@
+# This is the CD pipeline for provisioning Azure Serivce to host Batch Update
+name: Pipeline-$(Build.DefinitionName)-$(Date:yyyyMMdd)$(Rev:.r)
+
+# manual trigger
+trigger: none
+
+variables:
+- template: ./yaml-templates/variables.yaml
+- name: targetEnv
+  value: dev
+- name: azureServiceConn
+  value: '${{variables.serviceConn}}-dev'
+
+pool:
+  vmImage: windows-latest
+
+stages:
+- stage: Build
+  displayName: 'Build IaC and App'
+  jobs:
+  - job: Build
+    displayName: 'Build Batch Job'
+    steps:
+    - task: UseDotNet@2
+      displayName: 'Download .NET'
+      inputs:
+        packageType: sdk
+        version: 6.x
+        installationPath: $(Agent.ToolsDirectory)/dotnet
+
+    - template: '/${{variables.yamlTemplateLoc}}/create-infra-package.yaml'
+      parameters:
+        resourceGroupName: $(resourceGroupName)
+        artifactName: $(artifactName)
+        deploymentFolder: $(deploymentFolder)
+
+    - template: '/${{variables.yamlTemplateLoc}}/build-dotnet-app.yaml'
+      parameters:
+        displayAppName: $(recipeName)
+        solution: '$(Build.SourcesDirectory)/$(recipeName)/development/$(projectFolder)/$(appName)/$(appName).csproj'
+        testProject: '$(Build.SourcesDirectory)/$(recipeName)/development/$(projectFolder)/$(appName).UnitTests/$(appName).UnitTests.csproj'
+        artifactName: $(appName)
+
+- stage: Dev_Infra
+  displayName: 'Provision to DEV'
+  jobs:
+  - template: '/${{variables.yamlTemplateLoc}}/provision-infra.yaml'
+    parameters:
+      deployArtifact: $(artifactName)
+      resourceGroupName: $(resourceGroupName)
+      targetEnv: ${{variables.targetEnv}}
+      serviceConnection: ${{variables.azureServiceConn}}
+
+- stage: Dev_App
+  displayName: 'Deploy to DEV'
+  jobs:
+  - template: '/${{variables.yamlTemplateLoc}}/deploy-func-app.yaml'
+    parameters:
+      resourceGroupName: $(resourceGroupName)
+      displayAppName: $(recipeName)
+      targetEnv: ${{variables.targetEnv}}
+      artifactName: $(appName)
+      serviceConnection: ${{variables.azureServiceConn}}
+      functionAppName: '$(funcAppName)'
+      functionAppType: 'functionAppLinux'
+      scmAccessRequired: true

@@ -1,0 +1,76 @@
+# This is a shared module for CD: Deploying Functions into Function App
+parameters:
+  - name: resourceGroupName 
+    displayName: 'Target resource group without envrionment suffix'
+    type: string
+  - name: displayAppName # use for labeling the stage, should be aplhanumeric only
+    type: string
+  - name: targetEnv 
+    type: string
+    default: dev
+    values:
+    - dev
+    - test
+    - prod
+  - name: artifactName 
+    type: string
+  - name: serviceConnection
+    type: string
+  - name: functionAppName
+    displayName: 'Functions App name without envrionment suffix'
+    type: string
+  - name: functionAppType
+    type: string
+  - name: scmAccessRequired
+    type: boolean
+
+jobs:
+- deployment: Deploy_App
+  displayName: Deploy App
+  variables:
+    targetEnvName: ${{upper(parameters.targetEnv)}}
+    rg-full-name: '${{parameters.resourceGroupName}}-${{parameters.targetEnv}}'
+    func-full-name: '${{parameters.functionAppName}}-${{parameters.targetEnv}}'
+  environment: ${{variables.targetEnvName}}
+  strategy:
+    runOnce:
+      deploy:
+        steps:
+        - download: none
+        - task: DownloadPipelineArtifact@2
+          displayName: 'Download Artifact'
+          inputs:
+            artifact: ${{parameters.artifactName}}
+            path: $(Build.SourcesDirectory)/drop
+
+        - task: AzureCLI@2
+          displayName: 'Enable SCM access (${{variables.targetEnvName}})'
+          condition: ${{parameters.scmAccessRequired}}
+          inputs:
+            azureSubscription: ${{parameters.serviceConnection}}
+            scriptType: pscore
+            scriptLocation: inlineScript
+            inlineScript: |
+              $agentIP = (New-Object net.webclient).downloadstring("https://api.ipify.org")
+              az functionapp config access-restriction add --resource-group $(rg-full-name) --name $(func-full-name) `
+                --rule-name build_server --action Allow --ip-address "$agentIP/32" --priority 250 --scm-site true
+
+        - task: AzureFunctionApp@1 
+          displayName: Deploy ${{parameters.displayAppName}} to ${{parameters.targetEnv}}
+          inputs:
+            azureSubscription: ${{parameters.serviceConnection}}
+            appType: ${{parameters.functionAppType}}
+            appName: $(func-full-name)
+            package: $(Build.SourcesDirectory)/drop/**/${{parameters.artifactName}}.zip
+
+        - task: AzureCLI@2
+          displayName: 'Disable SCM access (${{variables.targetEnvName}})'
+          condition: ${{parameters.scmAccessRequired}}
+          inputs:
+            azureSubscription: ${{parameters.serviceConnection}}
+            scriptType: pscore
+            scriptLocation: inlineScript
+            inlineScript: |
+              $agentIP = (New-Object net.webclient).downloadstring("https://api.ipify.org")
+              az functionapp config access-restriction remove --resource-group $(rg-full-name) --name $(func-full-name) `
+                --rule-name build_server --scm-site true

@@ -1,0 +1,19 @@
+# Package the necessary bicep modules and IaC for provisioning, and publish it to artifact
+parameters:
+  - name: artifactName # name of the package
+    type: string
+  - name: resourceGroupName # name of resource group (without environment)
+    type: string
+  - name: deploymentFolder # path to the deployment folder
+    type: string
+
+steps:
+- pwsh: |
+    mkdir '$(System.DefaultWorkingDirectory)/tmpPackage'
+    cd '$(System.DefaultWorkingDirectory)/tmpPackage'
+    mkdir resource-groups
+    cp -r '$(System.DefaultWorkingDirectory)/${{parameters.deploymentFolder}}/bicep-modules' './bicep-modules'
+    cp -r '$(System.DefaultWorkingDirectory)/${{parameters.deploymentFolder}}/resource-groups/${{parameters.resourceGroupName}}' './resource-groups/${{parameters.resourceGroupName}}'
+  displayName: Packaging
+- publish: '$(System.DefaultWorkingDirectory)/tmpPackage'
+  artifact: ${{parameters.artifactName}}
