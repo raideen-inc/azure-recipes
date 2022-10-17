@@ -63,25 +63,11 @@ resource dataNsg 'Microsoft.Network/networkSecurityGroups@2022-01-01' = {
           description: 'Allow inbound 1433'
           access: 'Allow'
           protocol: 'Tcp'
-          destinationAddressPrefix: 'Sql'
+          destinationAddressPrefix: 'VirtualNetwork'
           destinationPortRange: '1433'
           direction: 'Inbound'
           priority: 100
           sourceAddressPrefix: 'VirtualNetwork'
-          sourcePortRange: '*'
-        }
-      }
-      {
-        name: 'AllowSqlALBInBound'
-        properties: {
-          description: 'Allow inbound 1433'
-          access: 'Allow'
-          protocol: 'Tcp'
-          destinationAddressPrefix: 'Sql'
-          destinationPortRange: '1433'
-          direction: 'Inbound'
-          priority: 110
-          sourceAddressPrefix: 'AzureLoadBalancer'
           sourcePortRange: '*'
         }
       }
