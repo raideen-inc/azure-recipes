@@ -1,0 +1,40 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "environmentName": {
+            "value": "test"
+        },
+        "vnetAddressPrefixes": {
+            "value": [
+                "10.70.0.0/16"
+              ]
+        },
+        "dataSubnetAddress": {
+            "value": "10.70.1.0/24"
+        },
+        "appSubnetAddress": {
+            "value": "10.70.2.0/24"
+        },
+        "appIntSubnetAddress": {
+            "value": "10.70.3.0/26"
+        },
+        "vmSubnetAddress": {
+            "value": "10.70.4.0/24"
+        },
+        "gatewaySubnetAddress": {
+            "value": "10.70.3.128/26"
+        },
+        "gatewayClientAddress": {
+            "value": "10.71.0.0/24"
+        },
+        "base64RootCert": {
+            "reference": {
+                "keyVault": {
+                    "id": "/subscriptions/<your-sub-id>/resourceGroups/<your-rg-name>/providers/Microsoft.KeyVault/vaults/<your-kv-name>"
+                },
+                "secretName": "cicd-gateway-cert"
+                }
+        }
+    }
+}
