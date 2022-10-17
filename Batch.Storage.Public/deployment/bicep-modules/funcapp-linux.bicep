@@ -29,9 +29,6 @@ param funcStorageName string
 @description('Name of Key Vault used to store connection string as secret')
 param keyVaultName string
 
-// @description('Secert Name for storage account connection string')
-// param storageConnStrSecretName string = 'AzureWebJobsStorage-${funcAppName}'
-
 var storageConnStrSecretName = 'AzureWebJobsStorage-${funcAppName}'
 var appInsightsConnStrSecretName = 'AppInsights-${funcAppName}'
 var configureValues = {
