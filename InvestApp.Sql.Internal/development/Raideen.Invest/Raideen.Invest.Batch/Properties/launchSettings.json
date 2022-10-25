@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "Raideen.Invest.Batch": {
+      "commandName": "Project",
+      "commandLineArgs": "--port 7288",
+      "environmentVariables": {
+        "AZURE_SQL_CONNECTIONSTRING": "Server=(localdb)\\mssqllocaldb;Database=sqldb-demo-invest-local;Trusted_Connection=True;MultipleActiveResultSets=true"
+      }
+    }
+  }
+}

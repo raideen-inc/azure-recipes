@@ -1,0 +1,38 @@
+# This is the CI pipeline for Invest solution with manual trigger
+name: Pipeline-$(Build.DefinitionName)-$(Date:yyyyMMdd)$(Rev:.r)
+
+# manual or PR trigger
+trigger: none
+
+pool:
+  vmImage: windows-latest
+
+variables:
+- template: yaml-templates/variables.yaml
+- name: targetEnv
+  value: dev
+
+stages:
+- stage: Build
+  displayName: 'CI Build'
+  jobs:
+  - job: Build
+    displayName: 'Build Invest solution'
+    steps:
+    - task: UseDotNet@2
+      displayName: 'Download .NET '
+      inputs:
+        packageType: sdk
+        version: 6.x
+        installationPath: $(Agent.ToolsDirectory)/dotnet
+
+    - template: '/${{variables.yamlTemplateLoc}}/build-dotnet-app.yaml'
+      parameters:
+        displayAppName: $(webAppName)
+        solution: '$(Build.SourcesDirectory)/$(recipeName)/development/$(projectFolder)/$(webAppName)/$(webAppName).csproj'
+        testProject: '$(Build.SourcesDirectory)/$(recipeName)/development/$(projectFolder)/$(webAppName).UnitTests/$(webAppName).UnitTests.csproj'
+
+    - template: '/${{variables.yamlTemplateLoc}}/build-dotnet-app.yaml'
+      parameters:
+        displayAppName: $(batchAppName)
+        solution: '$(Build.SourcesDirectory)/$(recipeName)/development/$(projectFolder)/$(batchAppName)/$(batchAppName).csproj'

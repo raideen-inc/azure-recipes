@@ -1,0 +1,32 @@
+// Bicep module to provision a Linux App Service Plan
+// --------------------------------------------------
+@description('Location for the App Service Plan')
+param planLocation string
+
+@description('Name of the App Service Plan')
+param planName string
+
+// Found out a list of SKU: https://azure.microsoft.com/en-us/pricing/details/app-service/linux/ 
+@allowed([
+  'F1'
+  'B1'
+  'S1'
+  'P1V3'
+])
+@description('Pricing/Sizing tier of the App Service Plan')
+param planSku string
+
+resource appServicePlan 'Microsoft.Web/serverfarms@2022-03-01' = {
+  name: planName
+  location: planLocation
+  kind: 'linux'
+  sku: {
+    name: planSku
+  }
+  properties: {
+    // for Linux plan, you must set reserved to true
+    reserved: true
+  }
+}
+
+output id string = appServicePlan.id

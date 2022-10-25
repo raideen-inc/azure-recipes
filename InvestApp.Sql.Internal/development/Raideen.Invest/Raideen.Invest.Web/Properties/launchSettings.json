@@ -1,0 +1,29 @@
+{
+  "profiles": {
+    "Raideen.Invest.Web": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "AZURE_SQL_CONNECTIONSTRING": "Server=(localdb)\\mssqllocaldb;Database=sqldb-demo-invest-local;Trusted_Connection=True;MultipleActiveResultSets=true"
+      },
+      "dotnetRunMessages": true,
+      "applicationUrl": "https://localhost:7040;http://localhost:5041"
+    },
+    "IIS Express": {
+      "commandName": "IISExpress",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    }
+  },
+  "iisSettings": {
+    "windowsAuthentication": false,
+    "anonymousAuthentication": true,
+    "iisExpress": {
+      "applicationUrl": "http://localhost:9723",
+      "sslPort": 44313
+    }
+  }
+}

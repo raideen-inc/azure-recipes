@@ -1,0 +1,19 @@
+# File: Share variables
+variables:
+  serviceConn: 'sc-rg-demo-azurerecipes'
+  resourceGroupName: 'rg-demo-azurerecipes'
+  azureWebAppName: 'app-demo-invest'
+  azureFuncAppName: 'func-demo-invest'
+  keyVaultName: 'kv-demo-azurerecipes'
+
+  recipeName: 'InvestApp.Sql.Internal'
+  projectFolder: 'Raideen.Invest'
+  webAppName: 'Raideen.Invest.Web'
+  batchAppName: 'Raideen.Invest.Batch'
+  buildConfiguration: 'Release'
+
+  artifactName: 'bicep-template'
+  yamlTemplateLoc: '/${{variables.recipeName}}/deployment/devops-pipelines/yaml-templates'
+  deploymentFolder: '/${{variables.recipeName}}/deployment'
+
+  isMain: $[eq(variables['Build.SourceBranch'], 'refs/heads/main')]

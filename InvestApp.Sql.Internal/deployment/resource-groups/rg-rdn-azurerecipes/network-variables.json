@@ -1,0 +1,7 @@
+{
+    "vnetRgName": "rg-demo-networking",
+    "vnetName": "vnet-demo-azurerecipes",
+    "snetApp" : "snet-app",
+    "snetAppInt" : "snet-appInt",
+    "snetData" : "snet-data"
+}
