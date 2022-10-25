@@ -11,4 +11,4 @@ The following shows the deployment model:
 
 ![](internal-web-func-sql.png)
 
-For details walkthrough, please check out: [CI/CD automation in 60 minutes: Private Endpoint: Web & Function App with SQL Database](https://raideen.ca/2022/10/25/private-endpoint-web-amp-function-app-with-sql-database).
+For details walkthrough, please check out: [CI/CD automation in 60 minutes: Private Endpoint: Web & Function App with SQL Database](https://raideen.ca/2022/10/25/private-endpoint-web-function-app-with-sql-database).
