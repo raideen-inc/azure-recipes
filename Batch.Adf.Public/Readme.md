@@ -3,7 +3,7 @@
 This recipe, _Azure Data Factory CI/CD (Public)_ demostrate a few items in CI/CD automation:
 
 - Use Azure Data Factory to host batch job with Schedule trigger for scheduling
-- Add customized parameters for Azure Data Factory
+- Add customized parameters per environment for Azure Data Factory
 - Enable RBAC in both Storage Account with Managed Identity (MS Doc link)
 
 The following shows the deployment model:
