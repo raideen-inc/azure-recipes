@@ -1,0 +1,18 @@
+# File: Share variables
+variables:
+  serviceConn: 'sc-rg-demo-azurerecipes'
+  resourceGroupName: 'rg-demo-azurerecipes'
+  keyVaultName: 'kv-demo-azurerecipes'
+  adfSubscriptionId: '<your ADF subscription>' # can be queried via RG
+  adfName: 'adf-demo-batch'
+  adfRepoName: 'ADF'
+
+  recipeName: 'Batch.Adf.Public'
+  buildConfiguration: 'Release'
+
+  artifactName: 'bicep-template'
+  yamlTemplateLoc: '/${{variables.recipeName}}/deployment/devops-pipelines/yaml-templates'
+  deploymentFolder: '/${{variables.recipeName}}/deployment'
+  adfWorkingDir: '$(System.DefaultWorkingDirectory)/${{variables.recipeName}}/development/adf'
+  
+  isMain: $[eq(variables['Build.SourceBranch'], 'refs/heads/main')]

@@ -1,0 +1,21 @@
+{
+	"name": "restUsaPopulation",
+	"properties": {
+		"parameters": {
+			"drilldowns": {
+				"type": "string",
+				"defaultValue": "Nation"
+			},
+			"year": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "RestService",
+		"typeProperties": {
+			"url": "https://datausa.io/api/data?measures=Population",
+			"enableServerCertificateValidation": true,
+			"authenticationType": "Anonymous"
+		}
+	}
+}

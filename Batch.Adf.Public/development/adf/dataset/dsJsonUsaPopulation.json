@@ -1,0 +1,34 @@
+{
+	"name": "dsJsonUsaPopulation",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "restUsaPopulation",
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"drilldowns": {
+					"value": "@dataset().drilldowns",
+					"type": "Expression"
+				},
+				"year": {
+					"value": "@toLower(dataset().year)",
+					"type": "Expression"
+				}
+			}
+		},
+		"parameters": {
+			"drilldowns": {
+				"type": "string",
+				"defaultValue": "Nation"
+			},
+			"year": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "Shared"
+		},
+		"annotations": [],
+		"type": "RestResource",
+		"schema": []
+	}
+}

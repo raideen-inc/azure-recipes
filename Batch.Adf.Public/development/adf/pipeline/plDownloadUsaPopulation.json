@@ -1,0 +1,102 @@
+{
+	"name": "plDownloadUsaPopulation",
+	"properties": {
+		"activities": [
+			{
+				"name": "Download to CSV",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "RestSource",
+						"httpRequestTimeout": "00:01:40",
+						"requestInterval": "00.00:00:00.010",
+						"requestMethod": "GET",
+						"paginationRules": {
+							"supportRFC5988": "true"
+						}
+					},
+					"sink": {
+						"type": "DelimitedTextSink",
+						"storeSettings": {
+							"type": "AzureBlobStorageWriteSettings"
+						},
+						"formatSettings": {
+							"type": "DelimitedTextWriteSettings",
+							"quoteAllText": true,
+							"fileExtension": ".txt"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"path": "['Year']"
+								},
+								"sink": {
+									"name": "Year"
+								}
+							},
+							{
+								"source": {
+									"path": "['Population']"
+								},
+								"sink": {
+									"name": " Population"
+								}
+							},
+							{
+								"source": {
+									"path": "$['source'][0]['annotations']['source_name']"
+								},
+								"sink": {
+									"name": " Source"
+								}
+							}
+						],
+						"collectionReference": "$['data']"
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "dsJsonUsaPopulation",
+						"type": "DatasetReference",
+						"parameters": {
+							"drilldowns": "Nation",
+							"year": {
+								"value": "@toLower('')",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "dsCsvUsaPopulation",
+						"type": "DatasetReference",
+						"parameters": {
+							"fileName": {
+								"value": "@concat(formatDateTime(convertTimeZone(utcNow(),'UTC','Eastern Standard Time'),'yyyy-MM-ddTHHmmss'), '.csv')",
+								"type": "Expression"
+							}
+						}
+					}
+				]
+			}
+		],
+		"folder": {
+			"name": "Batch.Adf.Public"
+		},
+		"annotations": []
+	}
+}

@@ -1,0 +1,62 @@
+# This is a shared template for CI: Build, Scan, Unit Test, Package for ADF solution
+# See: https://learn.microsoft.com/en-us/azure/data-factory/continuous-integration-delivery-improvements
+parameters:
+- name: displayAppName # use for labeling the stage, should be aplhanumeric only
+  type: string
+- name: adfReference
+  type: string
+- name: adfWorkingDir 
+  type: string
+- name: artifactName 
+  type: string
+  default: ''
+- name: deploymentFolder
+  type: string
+  default: ''
+
+steps:
+  # Installs Node and the npm packages saved in your package.json file in the build
+- task: NodeTool@0
+  displayName: 'Install Node.js'
+  inputs:
+    versionSpec: '14.x'
+- task: Npm@1
+  displayName: 'Install npm package'
+  inputs:
+    command: 'install'
+    workingDir: ${{parameters.adfWorkingDir}} #replace with the package.json folder
+    verbose: true
+
+  # Validates all of the Data Factory resources in the repository. You'll get the same validation errors as when "Validate All" is selected.
+- task: Npm@1
+  displayName: 'Validate'
+  condition: and(eq('${{parameters.artifactName}}', ''), eq(variables['Agent.JobStatus'], 'Succeeded'))
+  inputs:
+    command: 'custom'
+    workingDir: ${{parameters.adfWorkingDir}} #replace with the package.json folder
+    customCommand: 'run build validate ${{parameters.adfWorkingDir}} ${{parameters.adfReference}}'
+
+  # Validate and then generate the ARM template into the artifact folder, which is the same as selecting "Publish" from the UX.
+  # The ARM template generated isn't published to the live version of the factory. Deployment should be done by using a CI/CD pipeline. 
+- task: Npm@1
+  displayName: 'Validate and Generate ARM template'
+  condition: and(ne('${{parameters.artifactName}}', ''), eq(variables['Agent.JobStatus'], 'Succeeded'))
+  inputs:
+    command: 'custom'
+    workingDir: ${{parameters.adfWorkingDir}} #replace with the package.json folder
+    customCommand: 'run build export ${{parameters.adfWorkingDir}} ${{parameters.adfReference}} ${{parameters.artifactName}}'
+
+  # Copy the parameter files and necessary scripts into the artifact folder
+- pwsh: |
+    cp -r '$(System.DefaultWorkingDirectory)/${{parameters.deploymentFolder}}/devops-pipelines/adf-param-files' '${{parameters.adfWorkingDir}}/${{parameters.artifactName}}/adf-param-files'
+    cp -r '$(System.DefaultWorkingDirectory)/${{parameters.deploymentFolder}}/devops-pipelines/scripts/*' '${{parameters.adfWorkingDir}}/${{parameters.artifactName}}'
+  displayName: Add parameter files
+  condition: and(ne('${{parameters.artifactName}}', ''), eq(variables['Agent.JobStatus'], 'Succeeded'))
+
+  # Publish the artifact to be used as a source for a release pipeline.
+- task: PublishPipelineArtifact@1
+  condition: and(ne('${{parameters.artifactName}}', ''), eq(variables['Agent.JobStatus'], 'Succeeded'))
+  inputs:
+    targetPath: '${{parameters.adfWorkingDir}}/${{parameters.artifactName}}' #replace with the package.json folder
+    artifact: ${{parameters.artifactName}}
+    publishLocation: 'pipeline'

@@ -1,0 +1,30 @@
+# This is the CI pipeline for ADF with manual trigger
+name: Pipeline-$(Build.DefinitionName)-$(Date:yyyyMMdd)$(Rev:.r)
+
+# manual or PR trigger
+trigger: none
+
+pool:
+  vmImage: windows-latest
+
+variables:
+- template: yaml-templates/variables.yaml
+- name: targetEnv
+  value: dev
+
+stages:
+- stage: Build
+  displayName: 'CI Build'
+  jobs:
+  - job: Build
+    displayName: 'Build ADF solution'
+    variables:
+      adfReference: '/subscriptions/$(adfSubscriptionId)/resourceGroups/$(resourceGroupName)-$(targetEnv)/providers/Microsoft.DataFactory/factories/$(adfName)-$(targetEnv)'
+    steps:
+    - template: '/${{variables.yamlTemplateLoc}}/build-adf-app.yaml'
+      parameters:
+        displayAppName: $(adfName)
+        adfReference: $(adfReference)
+        adfWorkingDir: $(adfWorkingDir)
+        artifactName: $(adfName)
+        deploymentFolder: $(deploymentFolder)

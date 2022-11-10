@@ -1,0 +1,47 @@
+{
+	"name": "dsCsvUsaPopulation",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "blobPublicStorage",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"fileName": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "Batch.Adf.Public"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": {
+					"value": "@dataset().fileName",
+					"type": "Expression"
+				},
+				"container": "raw"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "Year",
+				"type": "String"
+			},
+			{
+				"name": " Population",
+				"type": "String"
+			},
+			{
+				"name": " Source",
+				"type": "String"
+			}
+		]
+	}
+}
