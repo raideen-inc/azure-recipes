@@ -10,4 +10,4 @@ The following shows the deployment model:
 
 ![](adf-batch-public.png)
 
-For details walkthrough, please check out: [CI/CD automation in 60 minutes: Public Web App with Storage Account](https://raideen.ca/2022/11/10/azure-data-factory-ci-cd-public/).
+For details walkthrough, please check out: [CI/CD automation in 60 minutes: Azure Data Factory CI/CD Public](https://raideen.ca/2022/11/10/azure-data-factory-ci-cd-public/).
