@@ -1,0 +1,40 @@
+# This is the CD pipeline for provisioning Azure Serivce to host Invest solution
+name: Pipeline-$(Build.DefinitionName)-$(Date:yyyyMMdd)$(Rev:.r)
+
+# manual trigger
+trigger: none
+
+pool:
+  vmImage: windows-latest
+
+variables:
+- template: ./yaml-templates/variables.yaml
+- name: targetEnv
+  value: dev
+- name: azureServiceConn
+  value: '${{variables.serviceConn}}-dev'
+
+stages:
+- stage: Build
+  displayName: 'Build IaC and App'
+  jobs:
+  - job: Build
+    displayName: 'Build Batch Job'
+    steps:
+    - template: '/${{variables.yamlTemplateLoc}}/create-infra-package.yaml'
+      parameters:
+        resourceGroupName: $(resourceGroupName)
+        artifactName: $(artifactName)
+        deploymentFolder: $(deploymentFolder)
+
+- stage: Dev_Infra
+  displayName: 'Provision to DEV'
+  jobs:
+  - template: '/${{variables.yamlTemplateLoc}}/provision-infra.yaml'
+    parameters:
+      deployArtifact: $(artifactName)
+      resourceGroupName: $(resourceGroupName)
+      targetEnv: ${{variables.targetEnv}}
+      serviceConnection: ${{variables.azureServiceConn}}
+      keyVaultName: $(keyVaultName)
+

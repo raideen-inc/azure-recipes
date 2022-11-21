@@ -1,0 +1,86 @@
+{
+	"name": "dsCsvOrgContact",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "blobIntBatch",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "Internal Batch"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"container": "raw"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "User Name",
+				"type": "String"
+			},
+			{
+				"name": "First Name",
+				"type": "String"
+			},
+			{
+				"name": "Last Name",
+				"type": "String"
+			},
+			{
+				"name": "Display Name",
+				"type": "String"
+			},
+			{
+				"name": "Job Title",
+				"type": "String"
+			},
+			{
+				"name": "Department",
+				"type": "String"
+			},
+			{
+				"name": "Office Number",
+				"type": "String"
+			},
+			{
+				"name": "Office Phone",
+				"type": "String"
+			},
+			{
+				"name": "Mobile Phone",
+				"type": "String"
+			},
+			{
+				"name": "Fax",
+				"type": "String"
+			},
+			{
+				"name": "Address",
+				"type": "String"
+			},
+			{
+				"name": "City",
+				"type": "String"
+			},
+			{
+				"name": "State or Province",
+				"type": "String"
+			},
+			{
+				"name": "ZIP or Postal Code",
+				"type": "String"
+			},
+			{
+				"name": "Country or Region",
+				"type": "String"
+			}
+		]
+	}
+}

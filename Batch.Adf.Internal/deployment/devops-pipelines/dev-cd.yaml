@@ -1,0 +1,46 @@
+# This is the CD pipeline for provisioning Azure Serivce to host Invest solution
+name: Pipeline-$(Build.DefinitionName)-$(Date:yyyyMMdd)$(Rev:.r)
+
+# manual trigger
+trigger: none
+
+pool:
+  vmImage: windows-latest
+
+variables:
+- template: ./yaml-templates/variables.yaml
+- name: targetEnv
+  value: dev
+- name: azureServiceConn
+  value: '${{variables.serviceConn}}-dev'
+- name: adfReference
+  value: '/subscriptions/$(adfSubscriptionId)/resourceGroups/$(resourceGroupName)-$(targetEnv)/providers/Microsoft.DataFactory/factories/$(adfName)-$(targetEnv)'
+
+stages:
+- stage: Build
+  displayName: 'Build IaC and App'
+  jobs:
+  - job: Build
+    displayName: 'Build Batch Job'
+    steps:
+    - template: '/${{variables.yamlTemplateLoc}}/build-adf-app.yaml'
+      parameters:
+        displayAppName: $(adfName)
+        adfReference: $(adfReference)
+        adfWorkingDir: $(adfWorkingDir)
+        artifactName: $(adfName)
+        deploymentFolder: $(deploymentFolder)
+
+- stage: Dev_App
+  displayName: 'Deploy to DEV'
+  jobs:
+  - template: '/${{variables.yamlTemplateLoc}}/deploy-adf-app.yaml'
+    parameters:
+      stageName: 'AdfApp'
+      targetEnv: ${{variables.targetEnv}}
+      resourceGroupName: $(resourceGroupName)
+      artifactName: $(adfName)
+      serviceConnection: ${{variables.azureServiceConn}}
+      adfName: $(adfName)
+
+

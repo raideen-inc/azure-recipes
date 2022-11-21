@@ -1,0 +1,47 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "factoryName": {
+            "value": "adf-demo-intbatch-test"
+        },
+        "plImportContact_CopyRetry": {
+            "value": 0
+        },
+        "blobIntBatch_properties_typeProperties_serviceEndpoint": {
+            "value": "https://stdemointbatchtest.blob.core.windows.net/"
+        },
+        "kvIntBatch_properties_typeProperties_baseUrl": {
+            "value": "https://kv-demo-intbatch-test.vault.azure.net/"
+        },
+        "sqlIntBatch_properties_typeProperties_connectionString_secretName": {
+            "value": "SqlConnString"
+        },
+        "trBlobRawContact_properties_typeProperties_scope": {
+            "value": "/subscriptions/85dafcff-13a1-40bc-b55e-47a80d9d4c6d/resourceGroups/rg-demo-azurerecipes-test/providers/Microsoft.Storage/storageAccounts/stdemointbatchtest"
+        },
+        "pepBlobintbatch_properties_privateLinkResourceId": {
+            "value": "/subscriptions/85dafcff-13a1-40bc-b55e-47a80d9d4c6d/resourceGroups/rg-demo-azurerecipes-test/providers/Microsoft.Storage/storageAccounts/stdemointbatchtest"
+        },
+        "pepBlobintbatch_properties_groupId": {
+            "value": "blob"
+        },
+        "pepKvintbatch_properties_privateLinkResourceId": {
+            "value": "/subscriptions/85dafcff-13a1-40bc-b55e-47a80d9d4c6d/resourceGroups/rg-demo-azurerecipes-test/providers/Microsoft.KeyVault/vaults/kv-demo-intbatch-test"
+        },
+        "pepKvintbatch_properties_groupId": {
+            "value": "vault"
+        },
+        "pepKvintbatch_properties_fqdns": {
+            "value": [
+                "kv-demo-intbatch-test.vault.azure.net"
+            ]
+        },
+        "pepSqlintbatch_properties_privateLinkResourceId": {
+            "value": "/subscriptions/85dafcff-13a1-40bc-b55e-47a80d9d4c6d/resourceGroups/rg-demo-azurerecipes-test/providers/Microsoft.Sql/servers/sql-demo-intbatch-test"
+        },
+        "pepSqlintbatch_properties_groupId": {
+            "value": "sqlServer"
+        }
+    }
+}

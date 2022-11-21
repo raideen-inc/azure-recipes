@@ -1,0 +1,59 @@
+# This is the CD pipeline to deploy  Office Hours API
+name: Pipeline-$(Build.DefinitionName)-$(Date:yyyyMMdd)$(Rev:.r)
+
+# manual trigger
+trigger: none
+
+pool:
+  vmImage: windows-latest
+
+variables:
+- template: ./yaml-templates/variables.yaml
+
+stages:
+- stage: Build
+  displayName: 'Build App from Dev'
+  condition: and(succeeded(), eq(variables.isMain, 'true')) 
+  variables:
+    adfReference: '/subscriptions/$(adfSubscriptionId)/resourceGroups/$(resourceGroupName)-dev/providers/Microsoft.DataFactory/factories/$(adfName)-dev'
+  jobs:
+  - job: Build
+    displayName: 'Build ADF solution'
+    steps:
+    - template: '/${{variables.yamlTemplateLoc}}/build-adf-app.yaml'
+      parameters:
+        displayAppName: $(adfName)
+        adfReference: $(adfReference)
+        adfWorkingDir: $(adfWorkingDir)
+        artifactName: $(adfName)
+        deploymentFolder: $(deploymentFolder)
+
+- stage: Test_Deploy
+  displayName: 'Deploy to Test'
+  condition: and(succeeded(), eq(variables.isMain, 'true')) 
+  variables:
+    targetEnv: 'test'
+  jobs:
+  - template: '/${{variables.yamlTemplateLoc}}/deploy-adf-app.yaml'
+    parameters:
+      stageName: 'AdfApp'
+      targetEnv: ${{variables.targetEnv}}
+      resourceGroupName: $(resourceGroupName)
+      artifactName: $(adfName)
+      serviceConnection: '${{variables.serviceConn}}-${{variables.targetEnv}}'
+      adfName: $(adfName)
+
+- stage: Prod_Deploy
+  displayName: 'Deploy to Prod'
+  condition: and(succeeded(), eq(variables.isMain, 'true')) 
+  variables:
+    targetEnv: 'prod'
+  jobs:
+  - template: '/${{variables.yamlTemplateLoc}}/deploy-adf-app.yaml'
+    parameters:
+      stageName: 'AdfApp'
+      targetEnv: ${{variables.targetEnv}}
+      resourceGroupName: $(resourceGroupName)
+      artifactName: $(adfName)
+      serviceConnection: '${{variables.serviceConn}}-${{variables.targetEnv}}'
+      adfName: $(adfName)

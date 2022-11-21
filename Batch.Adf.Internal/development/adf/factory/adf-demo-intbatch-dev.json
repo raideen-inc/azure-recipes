@@ -1,0 +1,9 @@
+{
+	"name": "adf-demo-intbatch-dev",
+	"location": "canadacentral",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "d0ec47b5-b782-42f3-955f-ec71b52a40a2",
+		"tenantId": "d4177bdd-cf0f-4b7e-afb5-701c9f1c6adf"
+	}
+}

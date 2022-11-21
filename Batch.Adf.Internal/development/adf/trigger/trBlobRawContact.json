@@ -1,0 +1,25 @@
+{
+	"name": "trBlobRawContact",
+	"properties": {
+		"annotations": [],
+		"runtimeState": "Started",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "plImportContact",
+					"type": "PipelineReference"
+				}
+			}
+		],
+		"type": "BlobEventsTrigger",
+		"typeProperties": {
+			"blobPathBeginsWith": "/raw/blobs/",
+			"blobPathEndsWith": "Input-OrgContact.csv",
+			"ignoreEmptyBlobs": true,
+			"scope": "/subscriptions/85dafcff-13a1-40bc-b55e-47a80d9d4c6d/resourceGroups/rg-demo-azurerecipes-dev/providers/Microsoft.Storage/storageAccounts/stdemointbatchdev",
+			"events": [
+				"Microsoft.Storage.BlobCreated"
+			]
+		}
+	}
+}

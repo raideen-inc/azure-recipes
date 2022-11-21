@@ -1,0 +1,21 @@
+{
+	"name": "sqlIntBatch",
+	"properties": {
+		"annotations": [],
+		"type": "AzureSqlDatabase",
+		"typeProperties": {
+			"connectionString": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "kvIntBatch",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "SqlConnString"
+			}
+		},
+		"connectVia": {
+			"referenceName": "AutoResolveIntegrationRuntime",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}

@@ -1,0 +1,28 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "environmentName": {
+            "value": "dev"
+        },
+        "storageSku": {
+            "value": "Standard_LRS"
+        },
+        "repoConfiguration": {
+            "value": {
+                "accountName": "raideen-demo",
+                "collaborationBranch": "main",
+                "repositoryName": "Azure Recipes",
+                "rootFolder": "/Batch.Adf.Internal/development/adf",
+                "type": "FactoryVSTSConfiguration",
+                "projectName": "Azure Recipes"
+            }
+        },
+        "sqlDbSize": {
+            "value": "basic"
+        },
+        "createADFPrivateEndpoint": {
+            "value": true
+        }
+    }
+}

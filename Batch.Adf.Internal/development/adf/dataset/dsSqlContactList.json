@@ -1,0 +1,41 @@
+{
+	"name": "dsSqlContactList",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "sqlIntBatch",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "Internal Batch"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "Id",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Email",
+				"type": "varchar"
+			},
+			{
+				"name": "FirstName",
+				"type": "varchar"
+			},
+			{
+				"name": "LastName",
+				"type": "varchar"
+			},
+			{
+				"name": "OfficePhone",
+				"type": "varchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "ContactList"
+		}
+	}
+}

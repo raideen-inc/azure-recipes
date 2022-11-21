@@ -1,0 +1,10 @@
+{
+	"name": "kvIntBatch",
+	"properties": {
+		"annotations": [],
+		"type": "AzureKeyVault",
+		"typeProperties": {
+			"baseUrl": "https://kv-demo-intbatch-dev.vault.azure.net/"
+		}
+	}
+}
